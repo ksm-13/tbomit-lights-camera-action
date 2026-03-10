@@ -419,10 +419,10 @@ app.post('/api/register', upload.single('paymentFile'), async (req, res) => {
     res.json({ success: true, id: docRef.id });
 
   } catch (err) {
-    console.error(err);
-    if (req.file) fs.unlink(req.file.path, () => {});
-    res.status(500).json({ error: 'Server error. Please try again.' });
-  }
+  console.error('REGISTER ERROR:', err);
+  if (req.file) fs.unlink(req.file.path, () => {});
+  res.status(500).json({ error: err.message || 'Server error' });
+}
 });
 
 // ── Admin login ───────────────────────────────────────────────────────────────
@@ -550,3 +550,4 @@ app.listen(PORT, () => {
   console.log(`  Admin password: ${ADMIN_PASS}\n`);
 
 });
+
