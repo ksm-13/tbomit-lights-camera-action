@@ -298,22 +298,12 @@ const ADMIN_PASS  = process.env.ADMIN_PASS || 'boxoffice2025';
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // Path to your Firebase service account key JSON
-const SERVICE_ACCOUNT_PATH =
-  process.env.GOOGLE_APPLICATION_CREDENTIALS ||
-  path.join(__dirname, 'serviceAccountKey.json');
-
-// ── Firebase init ─────────────────────────────────────────────────────────────
-if (!fs.existsSync(SERVICE_ACCOUNT_PATH)) {
-  console.error(
-    '\n  ERROR: serviceAccountKey.json not found.\n' +
-    '     Download it from Firebase Console -> Project Settings -> Service Accounts\n' +
-    '     and place it next to server.js, or set GOOGLE_APPLICATION_CREDENTIALS.\n'
-  );
-  process.exit(1);
-}
-
 admin.initializeApp({
-  credential: admin.credential.cert(require(SERVICE_ACCOUNT_PATH)),
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  }),
 });
 
 const firestore    = admin.firestore();
@@ -554,4 +544,5 @@ app.get('/api/admin/export/csv', adminAuth, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n  The Box Office running at http://localhost:${PORT}`);
   console.log(`  Admin password: ${ADMIN_PASS}\n`);
+
 });
